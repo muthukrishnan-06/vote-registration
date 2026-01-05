@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vote Registration</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(-45deg, #ff4e50, #f9d423, #1fddff, #2b32b2);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #fff;
+}
+
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+h2, h3 {
+  text-align: center;
+  text-shadow: 1px 1px 2px #000;
+}
+
+form {
+  background: #fff;
+  padding: 20px;
+  width: 350px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #000;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+input, select {
+  width: 95%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.gender {
+  margin: 8px 0;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #4caf50;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+#error {
+  color: red;
+  text-align: center;
+}
+
+#search {
+  width: 300px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.vote-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.vote-card {
+  background: #fff;
+  color: #000;
+  padding: 15px;
+  width: 250px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #000;
+}
+
+.vote-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.update-btn {
+  background: #2196f3;
+  color: white;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Vote Registration</h2>
+
+<form id="voteForm">
+  <input type="text" id="name" placeholder="Enter Name" required>
+
+  <input type="number" id="age" placeholder="Enter Age" required>
+
+  <div class="gender">
+    Gender:
+    <input type="radio" name="gender" value="Male" required> Male
+    <input type="radio" name="gender" value="Female"> Female
+    <input type="radio" name="gender" value="Other"> Other
+  </div>
+
+  <select id="city" required>
+    <option value="">Select City</option>
+    <option>Chennai</option>
+    <option>Madurai</option>
+    <option>Coimbatore</option>
+    <option>Salem</option>
+  </select>
+
+  <input type="text" id="voterId" placeholder="Voter ID (Last 4 digits)" required>
+
+  <button type="submit">Submit</button>
+  <p id="error"></p>
+</form>
+
+<input type="text" id="search" placeholder="Search by name..." onkeyup="searchVote()">
+
+<h3>Submitted Votes</h3>
+<div id="voteList" class="vote-container"></div>
+
+<script>
+let editIndex = null;
+const voteList = document.getElementById("voteList");
+
+function getVotes(){
+  return JSON.parse(localStorage.getItem("votes")) || [];
+}
+
+function saveVotes(votes){
+  localStorage.setItem("votes", JSON.stringify(votes));
+}
+
+function loadVotes(){
+  voteList.innerHTML = "";
+  const votes = getVotes();
+
+  if(votes.length === 0){
+    voteList.innerHTML = "<p>No votes submitted</p>";
+    return;
+  }
+
+  votes.forEach((v, i)=>{
+    const card = document.createElement("div");
+    card.className = "vote-card";
+
+    card.innerHTML = `
+      <h4>${v.name}</h4>
+      <p>Age: ${v.age}</p>
+      <p>Gender: ${v.gender}</p>
+      <p>City: ${v.city}</p>
+      <p>ID: ${v.voterId}</p>
+      <p>Date: ${v.date}</p>
+      <div class="vote-actions">
+        <button class="update-btn" onclick="editVote(${i})">Update</button>
+        <button class="delete-btn" onclick="deleteVote(${i})">Delete</button>
+      </div>
+    `;
+    voteList.appendChild(card);
+  });
+}
+
+function
